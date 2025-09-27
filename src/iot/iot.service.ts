@@ -58,8 +58,8 @@ export class IotService {
       kind,
       topic,
       received_at: new Date().toISOString(),
-      hash, // content-addressable hint
-      payload, // original JSON
+      hash,
+      payload,
     };
   }
 }

@@ -1,7 +1,7 @@
 export interface IoTBaseMessage {
   device_id: string;
-  ts: string; // ISO-8601
-  ts_epoch?: number; // optional unix seconds
+  ts: string;
+  ts_epoch?: number;
 }
 
 export interface DhtMessage extends IoTBaseMessage {
