@@ -12,8 +12,8 @@ import { isDhtMessage, isSoundMessage } from './iot.guards';
 import * as iotTypes from './iot.types';
 import { IotService } from './iot.service';
 import { FabricService } from '../fabric/fabric.service';
+import { Auth0Guard } from './auth0.guard';
 
-// @UseGuards(ApiKeyGuard)
 @Controller('iot')
 export class IotController {
   constructor(
@@ -21,11 +21,15 @@ export class IotController {
     private readonly fabric: FabricService,
   ) {}
 
+  @UseGuards(ApiKeyGuard)
   @Post('data')
   @HttpCode(202)
   async ingest(@Body() body: iotTypes.ForwardEnvelope) {
     const { topic, data } = body || {};
+    console.log(data);
     if (!topic || !data) return { accepted: false, reason: 'Bad envelope' };
+    const valid = this.svc.verifySignature(data);
+    if (!valid) return { accepted: false, reason: 'Invalid signature' };
 
     if (isDhtMessage(data)) {
       await this.svc.handleDht(topic, data);
@@ -40,6 +44,7 @@ export class IotController {
     return { accepted: false, reason: 'Unknown payload' };
   }
 
+  @UseGuards(Auth0Guard)
   @Get('read/:deviceId/:isoTs')
   async read(
     @Param('deviceId') deviceId: string,
@@ -49,6 +54,7 @@ export class IotController {
     return this.fabric.readTelemetry(key);
   }
 
+  @UseGuards(Auth0Guard)
   @Get('query/:deviceId')
   async byDevice(@Param('deviceId') deviceId: string) {
     return this.fabric.queryByDevice(deviceId);

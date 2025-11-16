@@ -2,6 +2,8 @@ export interface IoTBaseMessage {
   device_id: string;
   ts: string;
   ts_epoch?: number;
+  sig: string;
+  key_id: string;
 }
 
 export interface DhtMessage extends IoTBaseMessage {
